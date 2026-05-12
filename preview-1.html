@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Assistant Seller App</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f18;
+      --surface: #141a26;
+      --surface-2: rgba(255, 255, 255, 0.075);
+      --line: rgba(255, 255, 255, 0.11);
+      --text: #f8fbff;
+      --muted: rgba(248, 251, 255, 0.66);
+      --pink: #ff4fb8;
+      --purple: #836dff;
+      --cyan: #52d7ff;
+      --green: #24d18b;
+      --yellow: #ffbe55;
+      --red: #ff6b78;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at 12% 12%, rgba(82, 215, 255, 0.13), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(255, 79, 184, 0.16), transparent 32%),
+        linear-gradient(135deg, #070a11, #101621);
+      color: var(--text);
+      font-family: "Poppins", sans-serif;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .phone {
+      width: min(410px, 100%);
+      height: min(850px, calc(100vh - 32px));
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 34px;
+      background: #101621;
+      box-shadow: 0 26px 80px rgba(0, 0, 0, 0.56);
+    }
+
+    .screen {
+      display: none;
+      height: 100%;
+      overflow-y: auto;
+      padding: 24px 20px 104px;
+      background:
+        radial-gradient(circle at top right, rgba(255, 79, 184, 0.2), transparent 28%),
+        linear-gradient(160deg, #101621, #172033 52%, #101621);
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .screen::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .screen::-webkit-scrollbar-thumb {
+      background: var(--pink);
+      border-radius: 20px;
+    }
+
+    .start-screen {
+      display: none;
+      place-items: center;
+      text-align: center;
+      padding-bottom: 24px;
+    }
+
+    .start-screen.active {
+      display: grid;
+    }
+
+    .brand-mark {
+      width: 82px;
+      height: 82px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 22px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple), var(--pink));
+      box-shadow: 0 22px 44px rgba(131, 109, 255, 0.28);
+      font-size: 32px;
+      font-weight: 800;
+    }
+
+    h1 {
+      max-width: 320px;
+      font-size: 34px;
+      line-height: 1.12;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      font-size: 23px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      font-size: 16px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .start-screen p {
+      max-width: 310px;
+      margin: 12px auto 22px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .icon-button {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .panel {
+      margin-bottom: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface-2);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.18);
+    }
+
+    .hero-panel {
+      border: 0;
+      background:
+        linear-gradient(135deg, rgba(82, 215, 255, 0.18), rgba(255, 79, 184, 0.18)),
+        rgba(255, 255, 255, 0.08);
+    }
+
+    .primary-btn,
+    .ghost-btn {
+      width: 100%;
+      min-height: 50px;
+      margin-top: 14px;
+      border-radius: 16px;
+      color: var(--text);
+      font-weight: 700;
+    }
+
+    .primary-btn {
+      border: 0;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      box-shadow: 0 16px 30px rgba(255, 79, 184, 0.22);
+    }
+
+    .ghost-btn {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .field,
+    textarea,
+    select {
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      outline: 0;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+
+    textarea {
+      min-height: 104px;
+      resize: none;
+    }
+
+    select option {
+      background: #141a26;
+    }
+
+    .feature-grid,
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .feature,
+    .stat {
+      min-height: 104px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .feature span {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: rgba(255, 255, 255, 0.1);
+      font-weight: 800;
+    }
+
+    .stat strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 25px;
+      line-height: 1;
+    }
+
+    .good {
+      color: var(--green);
+    }
+
+    .warn {
+      color: var(--yellow);
+    }
+
+    .bad {
+      color: var(--red);
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .row:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .row-title {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .pill {
+      flex: 0 0 auto;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(36, 209, 139, 0.14);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .sync-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .sync-card {
+      min-height: 74px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.07);
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .chart-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+
+    .chart-total {
+      text-align: right;
+    }
+
+    .chart-total strong {
+      display: block;
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .chart-total span {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .income-chart {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .grid-line {
+      stroke: rgba(255, 255, 255, 0.08);
+      stroke-width: 1;
+    }
+
+    .axis-label {
+      fill: rgba(255, 255, 255, 0.56);
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    .income-area {
+      fill: url(#incomeFill);
+    }
+
+    .income-line {
+      fill: none;
+      stroke: url(#incomeStroke);
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .income-dot {
+      fill: #141a26;
+      stroke: var(--cyan);
+      stroke-width: 4;
+    }
+
+    .income-dot.featured {
+      fill: var(--cyan);
+      stroke: rgba(82, 215, 255, 0.28);
+      stroke-width: 8;
+    }
+
+    .donut-wrap {
+      display: grid;
+      grid-template-columns: 154px 1fr;
+      align-items: center;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .donut {
+      width: 154px;
+      height: 154px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle, #161c2b 0 50%, transparent 51%),
+        conic-gradient(
+          var(--pink) 0 38%,
+          var(--purple) 38% 64%,
+          var(--cyan) 64% 84%,
+          var(--yellow) 84% 100%
+        );
+    }
+
+    .donut-center {
+      width: 92px;
+      height: 92px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: rgba(11, 15, 24, 0.88);
+      text-align: center;
+    }
+
+    .donut-center strong {
+      display: block;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .donut-center span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .legend {
+      display: grid;
+      gap: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend-name {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .legend-value {
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+    }
+
+    .product-bars {
+      display: grid;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 94px 1fr 42px;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .track {
+      height: 9px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--cyan), var(--pink));
+    }
+
+    .plan {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .plan strong {
+      display: block;
+      margin: 8px 0;
+      font-size: 24px;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      right: 14px;
+      bottom: 14px;
+      left: 14px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 4px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: rgba(12, 16, 25, 0.94);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+    }
+
+    .nav-btn {
+      min-height: 48px;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+    }
+
+    .nav-btn span {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    @media (max-width: 430px) {
+      body {
+        padding: 0;
+      }
+
+      .phone {
+        width: 100%;
+        height: 100vh;
+        border: 0;
+        border-radius: 0;
+      }
+
+      .donut-wrap {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+
+      .legend {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="phone" aria-label="Smart Assistant seller app">
+    <section class="screen start-screen active" id="startScreen">
+      <div>
+        <div class="brand-mark">SA</div>
+        <h1>Smart Assistant for Online Sellers</h1>
+        <p>Inventory, cash flow, customer insights, and AI campaign tools for TikTok Shop, Shopee, and Lazada.</p>
+        <button class="primary-btn" type="button" data-screen="ordersScreen">Open Dashboard</button>
+        <button class="ghost-btn" type="button" data-screen="plansScreen">View Plans</button>
+      </div>
+    </section>
+
+    <section class="screen" id="ordersScreen">
+      <div class="top-bar">
+        <div>
+          <h2>Orders</h2>
+          <p class="muted">Sales overview, cash flow, and inventory alerts.</p>
+        </div>
+        <button class="icon-button" type="button" aria-label="Notifications">!</button>
+      </div>
+
+      <div class="panel hero-panel">
+        <h3>Smart Inventory Ledger</h3>
+        <p class="muted">Live stock updates are synced from connected shops and matched with recent sales.</p>
+        <div class="sync-list">
+          <div class="sync-card">TikTok<br>Connected</div>
+          <div class="sync-card">Shopee<br>Connected</div>
+          <div class="sync-card">Lazada<br>Ready</div>
+        </div>
+      </div>
+
+      <div class="stat-grid">
+        <div class="panel stat">
+          <span class="muted">Sales Today</span>
+          <strong>PHP 58.4K</strong>
+          <span class="good">+14.2%</span>
+        </div>
+        <div class="panel stat">
+          <span class="muted">Net Cash Flow</span>
+          <strong>PHP 31.9K</strong>
+          <span class="good">Healthy</span>
+        </div>
+        <div class="panel stat">
+          <span class="muted">Open Orders</span>
+          <strong>142</strong>
+          <span class="warn">18 pending</span>
+        </div>
+        <div class="panel stat">
+          <span class="muted">Inventory Alerts</span>
+          <strong>9</strong>
+          <span class="bad">3 urgent</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="chart-head">
+          <div>
+            <h3>Cash Flow Dashboard</h3>
+            <p class="muted">Updated income trend</p>
+          </div>
+          <div class="chart-total">
+            <strong>PHP 58.4K</strong>
+            <span>+14.2%</span>
+          </div>
+        </div>
+
+        <svg class="income-chart" viewBox="0 0 320 190" role="img" aria-label="Income graph for the last seven days">
+          <defs>
+            <linearGradient id="incomeStroke" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0%" stop-color="#52d7ff" />
+              <stop offset="52%" stop-color="#836dff" />
+              <stop offset="100%" stop-color="#ff4fb8" />
+            </linearGradient>
+            <linearGradient id="incomeFill" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stop-color="#ff4fb8" stop-opacity="0.32" />
+              <stop offset="100%" stop-color="#ff4fb8" stop-opacity="0" />
+            </linearGradient>
+          </defs>
+          <line class="grid-line" x1="8" y1="35" x2="312" y2="35" />
+          <line class="grid-line" x1="8" y1="80" x2="312" y2="80" />
+          <line class="grid-line" x1="8" y1="125" x2="312" y2="125" />
+          <path class="income-area" d="M15 132 C45 118, 58 92, 86 98 C116 105, 124 67, 154 73 C184 79, 192 40, 220 48 C250 56, 260 28, 305 22 L305 160 L15 160 Z" />
+          <path class="income-line" d="M15 132 C45 118, 58 92, 86 98 C116 105, 124 67, 154 73 C184 79, 192 40, 220 48 C250 56, 260 28, 305 22" />
+          <circle class="income-dot" cx="15" cy="132" r="5" />
+          <circle class="income-dot" cx="86" cy="98" r="5" />
+          <circle class="income-dot" cx="154" cy="73" r="5" />
+          <circle class="income-dot" cx="220" cy="48" r="5" />
+          <circle class="income-dot featured" cx="305" cy="22" r="6" />
+          <text class="axis-label" x="10" y="182">Mon</text>
+          <text class="axis-label" x="72" y="182">Tue</text>
+          <text class="axis-label" x="137" y="182">Wed</text>
+          <text class="axis-label" x="204" y="182">Fri</text>
+          <text class="axis-label" x="282" y="182">Sun</text>
+        </svg>
+      </div>
+
+      <div class="panel">
+        <div class="chart-head">
+          <div>
+            <h3>Expense Distribution</h3>
+            <p class="muted">Current month spending</p>
+          </div>
+          <div class="chart-total">
+            <strong>PHP 21.8K</strong>
+            <span>-3.6%</span>
+          </div>
+        </div>
+
+        <div class="donut-wrap">
+          <div class="donut" aria-label="Expense distribution donut chart">
+            <div class="donut-center">
+              <strong>21.8K</strong>
+              <span>EXPENSES</span>
+            </div>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-name"><span class="dot" style="background: var(--pink)"></span>Ads</span><span class="legend-value">38%</span></div>
+            <div class="legend-item"><span class="legend-name"><span class="dot" style="background: var(--purple)"></span>Shipping</span><span class="legend-value">26%</span></div>
+            <div class="legend-item"><span class="legend-name"><span class="dot" style="background: var(--cyan)"></span>Packaging</span><span class="legend-value">20%</span></div>
+            <div class="legend-item"><span class="legend-name"><span class="dot" style="background: var(--yellow)"></span>Fees</span><span class="legend-value">16%</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="inventoryScreen">
+      <div class="top-bar">
+        <div>
+          <h2>Inventory</h2>
+          <p class="muted">Product list, best sellers, and dusty stock alerts.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Best Sellers</h3>
+        <div class="product-bars">
+          <div class="bar-row"><span>Earbuds</span><div class="track"><div class="fill" style="width: 92%"></div></div><strong>92%</strong></div>
+          <div class="bar-row"><span>Blender</span><div class="track"><div class="fill" style="width: 78%"></div></div><strong>78%</strong></div>
+          <div class="bar-row"><span>Tripod</span><div class="track"><div class="fill" style="width: 61%"></div></div><strong>61%</strong></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Product List</h3>
+        <div class="row">
+          <div><div class="row-title">Wireless Earbuds</div><p class="muted">18 units left</p></div>
+          <span class="bad">Low</span>
+        </div>
+        <div class="row">
+          <div><div class="row-title">Portable Blender</div><p class="muted">88 units left</p></div>
+          <span class="pill">Good</span>
+        </div>
+        <div class="row">
+          <div><div class="row-title">Mini Tripod</div><p class="muted">11 units left</p></div>
+          <span class="warn">Restock</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>Dusty Stock Alerts</h3>
+        <div class="row">
+          <div><div class="row-title">Phone Ring Light</div><p class="muted">No sale in 31 days</p></div>
+          <span class="warn">Promo</span>
+        </div>
+        <div class="row">
+          <div><div class="row-title">Desk Organizer</div><p class="muted">No sale in 26 days</p></div>
+          <span class="warn">Bundle</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="customersScreen">
+      <div class="top-bar">
+        <div>
+          <h2>Customer Insights</h2>
+          <p class="muted">Customer value tracker and marketing targets.</p>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="panel feature"><span>A</span><h3>VIP Buyers</h3><p class="muted">426 customers</p></div>
+        <div class="panel feature"><span>B</span><h3>Repeat Buyers</h3><p class="muted">1,204 customers</p></div>
+        <div class="panel feature"><span>C</span><h3>At Risk</h3><p class="muted">188 customers</p></div>
+        <div class="panel feature"><span>D</span><h3>New Leads</h3><p class="muted">792 customers</p></div>
+      </div>
+
+      <div class="panel">
+        <h3>Purchase History</h3>
+        <div class="row">
+          <div><div class="row-title">Maria L.</div><p class="muted">5 purchases, PHP 8.2K total</p></div>
+          <span class="pill">VIP</span>
+        </div>
+        <div class="row">
+          <div><div class="row-title">Andre P.</div><p class="muted">2 purchases, last order 42 days ago</p></div>
+          <span class="warn">Win Back</span>
+        </div>
+      </div>
+
+      <div class="panel hero-panel">
+        <h3>Recommended Marketing Targets</h3>
+        <p class="muted">Send a bundle offer to repeat buyers who purchased earbuds but have not bought accessories.</p>
+        <button class="primary-btn" type="button" data-screen="campaignScreen">Create Campaign</button>
+      </div>
+    </section>
+
+    <section class="screen" id="campaignScreen">
+      <div class="top-bar">
+        <div>
+          <h2>Campaign Generator</h2>
+          <p class="muted">Promotion suggestions, discount calculator, and message drafts.</p>
+        </div>
+      </div>
+
+      <div class="panel hero-panel">
+        <h3>Margin-Safe Promotion Generator</h3>
+        <p class="muted">Suggested promo: 12% discount keeps projected margin at 31% after platform fees.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Discount Calculator</h3>
+        <input class="field" type="number" value="899" aria-label="Product price">
+        <input class="field" type="number" value="12" aria-label="Discount percentage">
+        <button class="primary-btn" type="button" id="calculateBtn">Calculate Margin</button>
+        <p class="muted" id="marginResult">Estimated profit after discount: PHP 214 per unit.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Automated Marketing Suggestion</h3>
+        <select aria-label="Campaign type">
+          <option>Win-back campaign</option>
+          <option>VIP loyalty reward</option>
+          <option>Dusty stock clearance</option>
+          <option>New product launch</option>
+        </select>
+        <textarea aria-label="Automated message draft">Hi [Name], your favorite seller has a limited bundle deal for you. Get 12% off today and enjoy priority shipping on your next order.</textarea>
+        <button class="ghost-btn" type="button">Regenerate Draft</button>
+      </div>
+    </section>
+
+    <section class="screen" id="plansScreen">
+      <div class="top-bar">
+        <div>
+          <h2>Subscription Plans</h2>
+          <p class="muted">Membership perks and premium seller features.</p>
+        </div>
+      </div>
+
+      <div class="panel plan">
+        <h3>Free Starter Plan</h3>
+        <strong>PHP 0</strong>
+        <p class="muted">Basic inventory ledger, limited campaign drafts, and up to 3 connected shops.</p>
+        <button class="ghost-btn" type="button">Current Plan</button>
+      </div>
+
+      <div class="panel plan hero-panel">
+        <h3>Monthly Plan</h3>
+        <strong>PHP 399/mo</strong>
+        <p class="muted">Advanced customer insights, tiered loyalty rewards, seller spotlight, and priority cloud storage.</p>
+        <button class="primary-btn" type="button">Upgrade Monthly</button>
+      </div>
+
+      <div class="panel plan">
+        <h3>Annual Plan</h3>
+        <strong>PHP 3,999/yr</strong>
+        <p class="muted">Includes premium tools, exclusive business community, early access updates, and multi-platform sync for more than 3 shops.</p>
+        <button class="primary-btn" type="button">Upgrade Annual</button>
+      </div>
+    </section>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-btn active" type="button" data-screen="ordersScreen"><span>O</span>Orders</button>
+      <button class="nav-btn" type="button" data-screen="inventoryScreen"><span>I</span>Stock</button>
+      <button class="nav-btn" type="button" data-screen="customersScreen"><span>C</span>Customers</button>
+      <button class="nav-btn" type="button" data-screen="campaignScreen"><span>G</span>Campaign</button>
+      <button class="nav-btn" type="button" data-screen="plansScreen"><span>P</span>Plans</button>
+    </nav>
+  </main>
+
+  <script>
+    const screens = document.querySelectorAll(".screen");
+    const buttons = document.querySelectorAll("[data-screen]");
+    const nav = document.querySelector(".bottom-nav");
+    const navButtons = document.querySelectorAll(".nav-btn");
+    const navScreens = ["ordersScreen", "inventoryScreen", "customersScreen", "campaignScreen", "plansScreen"];
+
+    function showScreen(screenId) {
+      screens.forEach((screen) => {
+        screen.classList.toggle("active", screen.id === screenId);
+      });
+
+      navButtons.forEach((button) => {
+        button.classList.toggle("active", button.dataset.screen === screenId);
+      });
+
+      nav.style.display = navScreens.includes(screenId) ? "grid" : "none";
+    }
+
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => showScreen(button.dataset.screen));
+    });
+
+    document.getElementById("calculateBtn").addEventListener("click", () => {
+      document.getElementById("marginResult").textContent = "Estimated profit after discount: PHP 214 per unit. Margin remains safe at 31%.";
+    });
+
+    showScreen("startScreen");
+  </script>
+</body>
+</html>
